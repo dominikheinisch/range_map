@@ -7,6 +7,7 @@
 
 
 const auto LOWEST = std::numeric_limits<int>::lowest();
+const auto MAX = std::numeric_limits<int>::max();
 
 struct RangeMapTest : public ::testing::Test {
     void SetUp() {
@@ -34,4 +35,34 @@ TEST_F(RangeMapTest, testAddWrongRangeGreaterBegin) {
 TEST_F(RangeMapTest, testAddWrongRangeBeginEqualEnd) {
     sut->add(3, 3, 'c');
     checkResult(std::map<int, char>{{LOWEST, '*'}});
+}
+
+TEST_F(RangeMapTest, testAddInnerWithMaxKeyEnd) {
+    sut->add(10, MAX, 'b');
+    auto expected = std::map<int, char> {{LOWEST, '*'}, {10, 'b'}, {MAX, '*'}};
+    checkResult(expected);
+}
+
+TEST_F(RangeMapTest, testAddInnerSameToDefaultMap) {
+    sut->add(-5, -3, '*');
+    auto expected = std::map<int, char> {{LOWEST, '*'}};
+    checkResult(expected);
+}
+
+TEST_F(RangeMapTest, testAddInnerNegative) {
+    sut->add(-5, -2, 'a');
+    auto expected = std::map<int, char> {{LOWEST, '*'}, {-5, 'a'}, {-2, '*'}};
+    checkResult(expected);
+}
+
+TEST_F(RangeMapTest, testAddInnerPositive) {
+    sut->add(2, 8, 'a');
+    auto expected = std::map<int, char> {{LOWEST, '*'}, {2, 'a'}, {8, '*'}};
+    checkResult(expected);
+}
+
+TEST_F(RangeMapTest, testAddOnBottomOfDefaultMap) {
+    sut->add(LOWEST, LOWEST+1, 'w');
+    auto expected = std::map<int, char> {{LOWEST, 'w'}, {LOWEST + 1, '*'}};
+    checkResult(expected);
 }
