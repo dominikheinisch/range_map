@@ -25,3 +25,13 @@ struct RangeMapTest : public ::testing::Test {
 TEST_F(RangeMapTest, testCtor) {
     checkResult(std::map<int, char>{{LOWEST, '*'}});
 }
+
+TEST_F(RangeMapTest, testAddWrongRangeGreaterBegin) {
+    sut->add(3, 2, 'c');
+    checkResult(std::map<int, char>{{LOWEST, '*'}});
+}
+
+TEST_F(RangeMapTest, testAddWrongRangeBeginEqualEnd) {
+    sut->add(3, 3, 'c');
+    checkResult(std::map<int, char>{{LOWEST, '*'}});
+}
