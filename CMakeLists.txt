@@ -25,7 +25,7 @@ endif()
 
 if (ut)
   add_library(impl ${sources})
-  add_subdirectory(lib/gtest-1.8.0)
+  add_subdirectory(3rdparty/gtest-1.8.0)
   enable_testing()
   include_directories(
     ${gtest_SOURCE_DIR}/include
