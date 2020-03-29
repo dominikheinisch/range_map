@@ -1,7 +1,8 @@
 #pragma once
 
-#include <map>
+#include <iterator>
 #include <limits>
+#include <map>
 #include <utility>
 
 
@@ -20,7 +21,21 @@ public:
         if (!(keyBegin < keyEnd)) {
             return;
         }
-        // TODO
+        auto lowerBound = m_map.lower_bound(keyBegin);
+        auto upperBound = m_map.upper_bound(keyEnd);
+        auto stored = std::next(upperBound, -1)->second;
+        m_map.erase(lowerBound, upperBound);
+        lowerBound = m_map.emplace_hint(upperBound, keyBegin, val);
+        bool isAdditionToEnd = !(keyEnd < upperBound->first);
+        if((isAdditionToEnd || keyEnd < upperBound->first) && !(stored == lowerBound->second)) {
+            m_map.emplace_hint(upperBound, keyEnd, stored);
+        }
+
+        // neighbor duplicates removal
+        bool isAdditionToBegin = m_map.begin() == lowerBound;
+        if(!isAdditionToBegin && std::next(lowerBound, -1)->second == lowerBound->second) {
+            m_map.erase(lowerBound);
+        }
     }
 
     const V& operator[](const K& key ) const {
