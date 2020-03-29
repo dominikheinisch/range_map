@@ -8,6 +8,7 @@
 
 template<typename K, typename V>
 class range_map {
+    using const_iterator = typename std::map<K,V>::const_iterator;
 
 protected:
     std::map<K, V> m_map;
@@ -17,9 +18,9 @@ public:
         m_map.emplace_hint(m_map.end(), std::numeric_limits<K>::lowest(), val);
     }
 
-    void add(const K& keyBegin, const K& keyEnd, const V& val) {
+    std::pair<const_iterator, bool> add(const K& keyBegin, const K& keyEnd, const V& val) {
         if (!(keyBegin < keyEnd)) {
-            return;
+            return std::make_pair(m_map.end(), false);
         }
         auto lowerBound = m_map.lower_bound(keyBegin);
         auto upperBound = m_map.upper_bound(keyEnd);
@@ -30,10 +31,12 @@ public:
         if (isAdditionToBegin || !isPrevEqualNew) {
             m_map.emplace_hint(upperBound, keyBegin, val);
         }
+        const auto resultIt = std::next(upperBound, -1);
         bool isStoredEqualNew = stored == val;
         if(!isStoredEqualNew) {
             m_map.emplace_hint(upperBound, keyEnd, stored);
         }
+        return std::make_pair(resultIt, true);
     }
 
     const V& operator[](const K& key ) const {

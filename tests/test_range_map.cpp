@@ -39,17 +39,24 @@ TEST_F(RangeMapTest, testCtor) {
 }
 
 TEST_F(RangeMapTest, testAddWrongRangeGreaterBegin) {
-    sut->add(3, 2, 'c');
+    auto [it, status] = sut->add(3, 2, 'c');
+    EXPECT_EQ(it, sut->getRawMap().cend());
+    EXPECT_FALSE(status);
     checkResult(std::map<int, char>{{LOWEST, '*'}});
 }
 
 TEST_F(RangeMapTest, testAddWrongRangeBeginEqualEnd) {
-    sut->add(3, 3, 'c');
+    auto [it, status] = sut->add(3, 3, 'c');
+    EXPECT_EQ(it, sut->getRawMap().cend());
+    EXPECT_FALSE(status);
     checkResult(std::map<int, char>{{LOWEST, '*'}});
 }
 
 TEST_F(RangeMapTest, testAddInnerWithMaxKeyEnd) {
-    sut->add(10, MAX, 'b');
+    auto [it, status] = sut->add(10, MAX, 'b');
+    auto addResult = std::pair<const int, char>{10, 'b'};
+    EXPECT_EQ(*it, addResult);
+    EXPECT_TRUE(status);
     auto expected = std::map<int, char> {{LOWEST, '*'}, {10, 'b'}, {MAX, '*'}};
     checkResult(expected);
 }
@@ -73,7 +80,10 @@ TEST_F(RangeMapTest, testAddInnerPositive) {
 }
 
 TEST_F(RangeMapTest, testAddToBeginOfDefaultMap) {
-    sut->add(LOWEST, LOWEST+1, 'w');
+    auto [it, status] = sut->add(LOWEST, LOWEST + 1, 'w');
+    auto addResult = std::pair<const int, char>{LOWEST, 'w'};
+    EXPECT_EQ(*it, addResult);
+    EXPECT_TRUE(status);
     auto expected = std::map<int, char> {{LOWEST, 'w'}, {LOWEST + 1, '*'}};
     checkResult(expected);
 }
@@ -86,13 +96,19 @@ TEST_F(RangeMapTest, testAddInnerDifferentElem) {
 
 TEST_F(RangeMapTest, testAddInnerSameElem) {
     setDefaultRawMap();
-    sut->add(2, 5, 'a');
+    auto [it, status] = sut->add(2, 5, 'a');
+    auto addResult = std::pair<const int, char>{0, 'a'};
+    EXPECT_EQ(*it, addResult);
+    EXPECT_TRUE(status);
     checkResult(DEFAULT_RAW_MAP);
 }
 
 TEST_F(RangeMapTest, testAddToBeginOfElemRange) {
     setDefaultRawMap();
-    sut->add(0, 1, 'c');
+    auto [it, status] = sut->add(0, 1, 'c');
+    auto addResult = std::pair<const int, char>{0, 'c'};
+    EXPECT_EQ(*it, addResult);
+    EXPECT_TRUE(status);
     auto expected = std::map<int, char>{{LOWEST, '*'}, {0, 'c'}, {1, 'a'}, {10, 'b'}, {15, '*'}};
     checkResult(expected);
 }
