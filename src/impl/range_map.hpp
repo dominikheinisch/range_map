@@ -24,17 +24,15 @@ public:
         auto lowerBound = m_map.lower_bound(keyBegin);
         auto upperBound = m_map.upper_bound(keyEnd);
         auto stored = std::next(upperBound, -1)->second;
-        m_map.erase(lowerBound, upperBound);
-        lowerBound = m_map.emplace_hint(upperBound, keyBegin, val);
-        bool isAdditionToEnd = !(keyEnd < upperBound->first);
-        if((isAdditionToEnd || keyEnd < upperBound->first) && !(stored == lowerBound->second)) {
-            m_map.emplace_hint(upperBound, keyEnd, stored);
-        }
-
-        // neighbor duplicates removal
         bool isAdditionToBegin = m_map.begin() == lowerBound;
-        if(!isAdditionToBegin && std::next(lowerBound, -1)->second == lowerBound->second) {
-            m_map.erase(lowerBound);
+        bool isPrevEqualNew = std::next(lowerBound, -1)->second == val;
+        m_map.erase(lowerBound, upperBound);
+        if (isAdditionToBegin || !isPrevEqualNew) {
+            m_map.emplace_hint(upperBound, keyBegin, val);
+        }
+        bool isStoredEqualNew = stored == val;
+        if(!isStoredEqualNew) {
+            m_map.emplace_hint(upperBound, keyEnd, stored);
         }
     }
 
